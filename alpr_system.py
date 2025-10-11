@@ -16,6 +16,12 @@ from typing import List, Tuple, Optional, Dict, Any
 from datetime import datetime
 import uuid
 
+# Version info
+try:
+    from __init__ import __version__
+except ImportError:
+    __version__ = "1.0.0"
+
 # Core dependencies
 try:
     from ultralytics import YOLO
@@ -115,6 +121,7 @@ class ALPRSystem:
         # Initialize Supabase if enabled
         self.supabase_client: Optional[Client] = None
         self.current_test_run_id: Optional[str] = None
+        self.pending_detections: List[Dict[str, Any]] = []  # Batch storage for Supabase
         if self.enable_supabase:
             print("Initializing Supabase connection...")
             self._init_supabase()
@@ -439,9 +446,9 @@ class ALPRSystem:
                             "first_seen": frame_number,
                         }
                         
-                        # Store in Supabase
+                        # Queue detection for batch Supabase upload
                         if self.enable_supabase and self.current_test_run_id:
-                            self._store_detection(frame_number, vehicle_id, plate_text, confidence, plate_bbox)
+                            self._queue_detection(frame_number, vehicle_id, plate_text, confidence, plate_bbox)
             
             # Add to results
             cached_plate = self.vehicle_plates.get(vehicle_id)
@@ -453,6 +460,8 @@ class ALPRSystem:
                     "plate_text": cached_plate["text"],
                     "plate_bbox": cached_plate["bbox"],
                     "confidence": cached_plate["confidence"],
+                    "timestamp": datetime.now().isoformat(),
+                    "version": __version__,
                 })
             
             # Visualize if requested
@@ -465,7 +474,7 @@ class ALPRSystem:
         
         return frame, results
     
-    def _store_detection(
+    def _queue_detection(
         self,
         frame_number: int,
         vehicle_id: int,
@@ -473,25 +482,41 @@ class ALPRSystem:
         confidence: float,
         bbox: Tuple[float, float, float, float]
     ):
-        """Store detection in Supabase."""
-        if not self.supabase_client or not self.current_test_run_id:
+        """Queue detection for batch upload to Supabase."""
+        if not self.current_test_run_id:
+            return
+        
+        data = {
+            "test_run_id": self.current_test_run_id,
+            "frame_number": frame_number,
+            "vehicle_id": vehicle_id,
+            "plate_text": plate_text,
+            "confidence": confidence,
+            "bbox_x1": bbox[0],
+            "bbox_y1": bbox[1],
+            "bbox_x2": bbox[2],
+            "bbox_y2": bbox[3],
+            "timestamp": datetime.now().isoformat(),
+            "version": __version__,
+        }
+        self.pending_detections.append(data)
+    
+    def bulk_upload_detections(self):
+        """
+        Upload all pending detections to Supabase in one batch.
+        Call this at the end of processing.
+        """
+        if not self.enable_supabase or not self.supabase_client or not self.pending_detections:
             return
         
         try:
-            data = {
-                "test_run_id": self.current_test_run_id,
-                "frame_number": frame_number,
-                "vehicle_id": vehicle_id,
-                "plate_text": plate_text,
-                "confidence": confidence,
-                "bbox_x1": bbox[0],
-                "bbox_y1": bbox[1],
-                "bbox_x2": bbox[2],
-                "bbox_y2": bbox[3],
-            }
-            self.supabase_client.table("detections").insert(data).execute()
+            print(f"\n📤 Uploading {len(self.pending_detections)} detections to Supabase...")
+            # Supabase supports batch inserts
+            self.supabase_client.table("detections").insert(self.pending_detections).execute()
+            print(f"  ✓ Successfully uploaded {len(self.pending_detections)} detections")
+            self.pending_detections.clear()
         except Exception as e:
-            print(f"⚠ Failed to store detection: {e}")
+            print(f"  ⚠ Failed to bulk upload detections: {e}")
     
     def get_statistics(self) -> Dict[str, Any]:
         """

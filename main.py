@@ -255,7 +255,9 @@ def main():
         'Plate_X1',
         'Plate_Y1',
         'Plate_X2',
-        'Plate_Y2'
+        'Plate_Y2',
+        'Timestamp',
+        'Version'
     ])
     
     # Processing loop
@@ -266,6 +268,8 @@ def main():
     
     print("Processing video...")
     print("-" * 70)
+    print()  # Initial line for progress bar
+    print()  # Initial line for stats
     
     try:
         while cap.isOpened():
@@ -308,7 +312,9 @@ def main():
                     result['plate_text'],
                     f"{result['confidence']:.4f}",
                     *result['vehicle_bbox'],
-                    *result['plate_bbox']
+                    *result['plate_bbox'],
+                    result['timestamp'],
+                    result['version']
                 ])
                 all_results.append(result)
             
@@ -328,26 +334,45 @@ def main():
             processed_frames += 1
             frame_number += 1
             
-            if processed_frames % 30 == 0 or processed_frames == 1:
-                elapsed = time.time() - start_time
-                processing_fps = processed_frames / elapsed if elapsed > 0 else 0
-                progress = (frame_number / total_frames) * 100 if total_frames > 0 else 0
-                
-                print(f"Frame {frame_number}/{total_frames} ({progress:.1f}%) | "
-                      f"FPS: {processing_fps:.1f} | "
-                      f"Detections: {len(all_results)}", end='\r')
+            # Update progress every frame for real-time feedback
+            elapsed = time.time() - start_time
+            processing_fps = processed_frames / elapsed if elapsed > 0 else 0
+            progress = (frame_number / total_frames) * 100 if total_frames > 0 else 0
+            
+            # Calculate ETA
+            frames_remaining = total_frames - frame_number if total_frames > 0 else 0
+            eta_seconds = frames_remaining / processing_fps if processing_fps > 0 else 0
+            eta_minutes = int(eta_seconds // 60)
+            eta_secs = int(eta_seconds % 60)
+            
+            # Progress bar
+            bar_length = 40
+            filled_length = int(bar_length * progress / 100)
+            bar = '█' * filled_length + '░' * (bar_length - filled_length)
+            
+            # Get current stats
+            stats = alpr.get_statistics()
+            
+            print(f"Progress: |{bar}| {progress:.1f}% Complete"
+                  f"\nFrame: {frame_number}/{total_frames} | "
+                  f"Speed: {processing_fps:.1f} FPS | "
+                  f"ETA: {eta_minutes:02d}:{eta_secs:02d} | "
+                  f"Vehicles: {stats['unique_vehicles']} | "
+                  f"Plates: {stats['plates_read']} | "
+                  f"Detections: {len(all_results)}"
+                  f"\033[2A", end='\r')
     
     except KeyboardInterrupt:
-        print("\n\nInterrupted by user")
+        print("\n\n\nInterrupted by user")
     
     except Exception as e:
-        print(f"\n\nError during processing: {e}", file=sys.stderr)
+        print(f"\n\n\nError during processing: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
     
     finally:
         # Cleanup
-        print("\n" + "-" * 70)
+        print("\n\n" + "-" * 70)
         print("Cleaning up...")
         
         cap.release()
@@ -358,6 +383,15 @@ def main():
         
         if args.visualize:
             cv2.destroyAllWindows()
+        
+        # Bulk upload detections to Supabase (if enabled)
+        if enable_supabase != False and len(all_results) > 0:
+            final_stats = alpr.get_statistics()
+            print(f"\n📊 Summary:")
+            print(f"  • Total detections queued: {len(all_results)}")
+            print(f"  • Unique vehicles: {final_stats['unique_vehicles']}")
+            print(f"  • License plates read: {final_stats['plates_read']}")
+            alpr.bulk_upload_detections()
         
         # End Supabase test run
         if enable_supabase != False:

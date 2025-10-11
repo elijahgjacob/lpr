@@ -1,0 +1,25 @@
+[run]
+source = .
+omit = 
+    tests/*
+    .venv/*
+    venv/*
+    setup.py
+    */site-packages/*
+    models/*
+    videos/*
+    results/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+
+[html]
+directory = htmlcov
+

@@ -9,6 +9,9 @@ omit =
     models/*
     videos/*
     results/*
+    download_resources.py
+    main.py
+    __init__.py
 
 [report]
 exclude_lines =

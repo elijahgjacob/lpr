@@ -1,0 +1,139 @@
+name: CI - Tests and Coverage
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov black flake8 mypy
+    
+    - name: Run tests with coverage
+      run: |
+        pytest tests/ -v --cov=. --cov-report=term --cov-report=xml --cov-report=html --cov-fail-under=80
+    
+    - name: Upload coverage reports to Codecov
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Check coverage threshold
+      run: |
+        coverage report --fail-under=80
+    
+    - name: Archive coverage results
+      if: matrix.python-version == '3.11'
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: htmlcov/
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install black flake8 mypy
+    
+    - name: Check code formatting with Black
+      run: |
+        black --check --diff .
+    
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+    
+    - name: Type check with mypy
+      run: |
+        mypy --ignore-missing-imports --check-untyped-defs *.py || true
+      continue-on-error: true
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Verify project structure
+      run: |
+        python -c "
+        import os
+        required_files = ['main.py', 'alpr_system.py', 'sort.py', 'utils.py', 'config.py']
+        missing = [f for f in required_files if not os.path.exists(f)]
+        if missing:
+            print(f'Missing files: {missing}')
+            exit(1)
+        print('✓ All required files present')
+        "
+    
+    - name: Run simplified integration test
+      run: |
+        python -c "
+        try:
+            import config
+            import utils
+            import sort
+            print('✓ All modules imported successfully')
+        except Exception as e:
+            print(f'✗ Import failed: {e}')
+            exit(1)
+        "
+    
+    - name: Verify CLI help works
+      run: |
+        python main.py --help

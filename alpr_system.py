@@ -73,12 +73,12 @@ class ALPRSystem:
         print("Initializing ALPR System...")
         print("=" * 60)
         
-        # Check dependencies
-        self._check_dependencies()
-        
-        # Configuration
+        # Configuration (set these FIRST before checking dependencies)
         self.use_roboflow = use_roboflow if use_roboflow is not None else config.USE_ROBOFLOW_API
         self.enable_supabase = enable_supabase if enable_supabase is not None else config.ENABLE_SUPABASE
+        
+        # Check dependencies
+        self._check_dependencies()
         
         # Validate configurations
         self._validate_configurations()

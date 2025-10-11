@@ -67,14 +67,17 @@ def mock_supabase():
 class TestALPRSystemInitialization:
     """Test ALPR system initialization."""
     
-    @patch('alpr_system.YOLO')
+    @patch('alpr_system.Sort')
+    @patch('alpr_system.torch.cuda.is_available', return_value=False)
     @patch('alpr_system.easyocr.Reader')
+    @patch('alpr_system.YOLO')
     @patch('alpr_system.config.USE_ROBOFLOW_API', False)
     @patch('alpr_system.config.ENABLE_SUPABASE', False)
-    def test_init_local_models(self, mock_reader, mock_yolo):
+    def test_init_local_models(self, mock_yolo, mock_reader, mock_cuda, mock_sort):
         """Test initialization with local models."""
         mock_yolo.return_value = Mock()
         mock_reader.return_value = Mock()
+        mock_sort.return_value = Mock()
         
         alpr = ALPRSystem()
         
@@ -85,34 +88,55 @@ class TestALPRSystemInitialization:
         assert alpr.ocr_reader is not None
         assert alpr.tracker is not None
     
-    @patch('alpr_system.YOLO')
-    @patch('alpr_system.easyocr.Reader')
+    @patch('alpr_system.Sort')
+    @patch('alpr_system.torch.cuda.is_available', return_value=False)
     @patch('alpr_system.Roboflow')
+    @patch('alpr_system.easyocr.Reader')
+    @patch('alpr_system.YOLO')
     @patch('alpr_system.config.USE_ROBOFLOW_API', True)
     @patch('alpr_system.config.ENABLE_SUPABASE', False)
     @patch('alpr_system.config.ROBOFLOW_API_KEY', 'test_key')
-    def test_init_with_roboflow(self, mock_rf_class, mock_reader, mock_yolo, mock_roboflow):
+    @patch('alpr_system.config.ROBOFLOW_WORKSPACE', 'test_workspace')
+    @patch('alpr_system.config.ROBOFLOW_PROJECT', 'test_project')
+    @patch('alpr_system.config.ROBOFLOW_VERSION', 1)
+    def test_init_with_roboflow(self, mock_yolo, mock_reader, mock_rf_class, mock_cuda, mock_sort):
         """Test initialization with Roboflow."""
         mock_yolo.return_value = Mock()
         mock_reader.return_value = Mock()
-        mock_rf_class.return_value = mock_roboflow
+        mock_sort.return_value = Mock()
+        
+        # Setup Roboflow mock chain
+        mock_rf_instance = Mock()
+        mock_workspace = Mock()
+        mock_project = Mock()
+        mock_version = Mock()
+        mock_version.model = Mock()
+        
+        mock_rf_class.return_value = mock_rf_instance
+        mock_rf_instance.workspace.return_value = mock_workspace
+        mock_workspace.project.return_value = mock_project
+        mock_project.version.return_value = mock_version
         
         alpr = ALPRSystem(use_roboflow=True)
         
         assert alpr.use_roboflow is True
         mock_rf_class.assert_called_once()
     
-    @patch('alpr_system.YOLO')
-    @patch('alpr_system.easyocr.Reader')
+    @patch('alpr_system.Sort')
+    @patch('alpr_system.torch.cuda.is_available', return_value=False)
     @patch('alpr_system.create_client')
+    @patch('alpr_system.easyocr.Reader')
+    @patch('alpr_system.YOLO')
     @patch('alpr_system.config.USE_ROBOFLOW_API', False)
     @patch('alpr_system.config.ENABLE_SUPABASE', True)
     @patch('alpr_system.config.SUPABASE_URL', 'https://test.supabase.co')
     @patch('alpr_system.config.SUPABASE_KEY', 'test_key')
-    def test_init_with_supabase(self, mock_create_client, mock_reader, mock_yolo, mock_supabase):
+    def test_init_with_supabase(self, mock_yolo, mock_reader, mock_create_client, mock_cuda, mock_sort):
         """Test initialization with Supabase."""
         mock_yolo.return_value = Mock()
         mock_reader.return_value = Mock()
+        mock_sort.return_value = Mock()
+        mock_supabase = Mock()
         mock_create_client.return_value = mock_supabase
         
         alpr = ALPRSystem(enable_supabase=True)

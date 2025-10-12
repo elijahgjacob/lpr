@@ -29,9 +29,9 @@ except ImportError:
     YOLO = None
 
 try:
-    import easyocr
+    from paddleocr import PaddleOCR
 except ImportError:
-    easyocr = None
+    PaddleOCR = None
 
 try:
     from roboflow import Roboflow
@@ -102,10 +102,15 @@ class ALPRSystem:
             self.plate_detector = YOLO(plate_model_path or config.PLATE_MODEL_PATH)
         
         # Initialize OCR
-        print("Initializing EasyOCR...")
+        print("Initializing PaddleOCR...")
         gpu_available = torch.cuda.is_available()
         print(f"  GPU Available: {gpu_available}")
-        self.ocr_reader = easyocr.Reader(config.OCR_LANGUAGES, gpu=gpu_available)
+        self.ocr_reader = PaddleOCR(
+            use_angle_cls=True,
+            lang='en',
+            use_gpu=gpu_available,
+            show_log=False
+        )
         
         # Initialize SORT tracker
         print("Initializing SORT tracker...")
@@ -141,8 +146,8 @@ class ALPRSystem:
         """Check if required dependencies are installed."""
         if YOLO is None:
             raise RuntimeError("ultralytics not installed. Run: pip install ultralytics")
-        if easyocr is None:
-            raise RuntimeError("easyocr not installed. Run: pip install easyocr")
+        if PaddleOCR is None:
+            raise RuntimeError("paddleocr not installed. Run: pip install paddleocr")
         if self.use_roboflow and Roboflow is None:
             raise RuntimeError("roboflow not installed. Run: pip install roboflow")
         if self.enable_supabase and Client is None:
@@ -364,26 +369,44 @@ class ALPRSystem:
         # Preprocess image
         processed = utils.preprocess_plate_image(plate_crop)
         
-        # Run OCR
+        # Run OCR with PaddleOCR
         try:
-            results = self.ocr_reader.readtext(
-                processed,
-                allowlist=config.OCR_ALLOWLIST,
-                detail=1
-            )
+            # PaddleOCR returns: [[[bbox], (text, confidence)], ...]
+            results = self.ocr_reader.ocr(processed, cls=True)
             
-            if not results:
+            if not results or not results[0]:
                 return None, 0.0
             
-            # Get best result
-            best_result = max(results, key=lambda x: x[2])  # Sort by confidence
-            text, confidence = best_result[1], best_result[2]
+            # Extract all text and confidences
+            texts = []
+            confidences = []
+            
+            for line in results[0]:
+                if line:
+                    text = line[1][0]  # (text, confidence)[0]
+                    conf = line[1][1]  # (text, confidence)[1]
+                    
+                    # Filter with allowlist
+                    filtered_text = ''.join(
+                        c for c in text if c in config.OCR_ALLOWLIST
+                    )
+                    
+                    if filtered_text:
+                        texts.append(filtered_text)
+                        confidences.append(conf)
+            
+            if not texts:
+                return None, 0.0
+            
+            # Combine results
+            final_text = ''.join(texts).strip()
+            avg_confidence = sum(confidences) / len(confidences)
             
             # Format and validate
-            formatted_text = utils.format_license_plate(text)
+            formatted_text = utils.format_license_plate(final_text)
             
-            if confidence >= config.OCR_CONFIDENCE_THRESHOLD and utils.validate_license_plate(formatted_text):
-                return formatted_text, confidence
+            if avg_confidence >= config.OCR_CONFIDENCE_THRESHOLD and utils.validate_license_plate(formatted_text):
+                return formatted_text, avg_confidence
             
         except Exception as e:
             print(f"⚠ OCR failed: {e}")

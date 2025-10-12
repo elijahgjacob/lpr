@@ -511,7 +511,9 @@ If you encounter issues during migration:
 
 ---
 
-**Version**: 1.0.0  
+**Note**: This migration guide is for v1.0.0 features (timestamp/version tracking). For OCR migration from EasyOCR to PaddleOCR (v1.1.0), see CHANGELOG.md.
+
+**Version**: 1.1.0  
 **Last Updated**: October 11, 2025  
 **Maintainer**: ALPR System Contributors
 

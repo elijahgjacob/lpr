@@ -1,12 +1,23 @@
-# Configuration Guide - Version 1.0.0
+# Configuration Guide - Version 1.1.0
 
 ## Overview
 
-This document covers the configuration for ALPR System v1.0.0, which includes enhanced tracking with timestamp and version fields, batch Supabase uploads, and real-time progress monitoring.
+This document covers the configuration for ALPR System v1.1.0, which includes enhanced tracking with timestamp and version fields, batch Supabase uploads, real-time progress monitoring, and PaddleOCR for improved accuracy.
 
 ---
 
-## 🆕 What's New in v1.0.0
+## 🆕 What's New in v1.1.0
+
+### OCR Engine Upgrade
+- **PaddleOCR**: Replaced EasyOCR with PaddleOCR for better accuracy
+- **Free & Local**: No API costs, runs entirely on your machine
+- **Better Accuracy**: Improved recognition of US license plates
+- **GPU Support**: Automatic GPU acceleration when available
+- **Fast Processing**: Optimized C++ backend for speed
+
+---
+
+## What's New in v1.0.0
 
 ### Enhanced Data Tracking
 - **Timestamp Field**: Every detection includes an ISO 8601 timestamp
@@ -154,6 +165,107 @@ PLATE_MODEL_PATH=models/license_plate_detector.pt
 1. **Environment Variables** (`.env` file) - Highest priority
 2. **config.py** defaults - Fallback
 3. **Function parameters** - Override at runtime
+
+---
+
+## 🔧 PaddleOCR Configuration
+
+### Installation
+
+**Requirements:**
+```bash
+pip install paddleocr>=2.7.0
+pip install paddlepaddle>=2.5.0  # CPU version
+
+# OR for GPU (if you have CUDA):
+pip install paddlepaddle-gpu>=2.5.0
+```
+
+### OCR Settings
+
+PaddleOCR automatically initializes with optimal settings:
+
+```python
+# In alpr_system.py
+self.ocr_reader = PaddleOCR(
+    use_angle_cls=True,  # Detect text orientation
+    lang='en',           # English language model
+    use_gpu=gpu_available,  # Auto-detect GPU
+    show_log=False       # Reduce console spam
+)
+```
+
+### Supported Languages
+
+PaddleOCR supports 80+ languages:
+- `en` - English (default for US plates)
+- `ch` - Chinese
+- `es` - Spanish
+- `fr` - French
+- And many more...
+
+Change language in `config.py`:
+```python
+OCR_LANGUAGES = ['en']  # For compatibility
+PADDLE_OCR_LANG = 'en'  # PaddleOCR language
+```
+
+### Performance Tuning
+
+**For Faster Processing:**
+```python
+# In alpr_system.py initialization
+self.ocr_reader = PaddleOCR(
+    use_angle_cls=True,
+    lang='en',
+    use_gpu=True,
+    show_log=False,
+    rec_batch_num=6,      # Batch processing
+    max_text_length=20,   # License plates are short
+    use_space_char=False  # No spaces in plates
+)
+```
+
+**For Better Accuracy:**
+- Ensure good quality video input (720p+)
+- Use preprocessing (already included in `utils.py`)
+- Adjust confidence threshold in `config.py`
+
+### GPU Acceleration
+
+PaddleOCR automatically uses GPU if available:
+
+**Check GPU Status:**
+```python
+import paddle
+print(paddle.is_compiled_with_cuda())  # Should be True for GPU
+```
+
+**To Force CPU:**
+```python
+# In alpr_system.py
+self.ocr_reader = PaddleOCR(
+    use_gpu=False,  # Force CPU
+    ...
+)
+```
+
+### Troubleshooting
+
+**Issue**: PaddleOCR not found
+```bash
+pip install --upgrade paddleocr paddlepaddle
+```
+
+**Issue**: Slow performance
+- Enable GPU if available
+- Reduce video resolution
+- Increase frame skipping (`--skip-frames`)
+
+**Issue**: Low accuracy
+- Check image quality
+- Adjust preprocessing in `utils.py`
+- Lower confidence threshold in `config.py`
 
 ---
 
@@ -419,7 +531,7 @@ python main.py --video input.mp4 --output out.csv 2>&1 | tee log.txt
 
 ---
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Last Updated**: October 11, 2025  
 **Maintainer**: ALPR System Contributors
 

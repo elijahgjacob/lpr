@@ -150,6 +150,29 @@ See `docs/MIGRATION_v1.0.md` for detailed migration instructions from pre-1.0 ve
 
 ---
 
+## [1.1.0] - 2025-10-11
+
+### Changed
+- **OCR Engine**: Migrated from EasyOCR to PaddleOCR for improved accuracy
+  - Better recognition of US license plates
+  - No API costs (runs locally)
+  - Comparable or better performance
+  - GPU acceleration when available
+
+### Technical Details
+- PaddleOCR v2.7+ with English language model
+- Drop-in replacement maintaining same output format
+- Enhanced text filtering with allowlist support
+- Improved confidence scoring
+
+### Benefits
+- **Zero Cost**: Completely free, no API limits
+- **Better Accuracy**: PaddleOCR often outperforms EasyOCR on English text
+- **Local Processing**: No cloud dependencies
+- **Fast**: Optimized C++ backend
+
+---
+
 ## [Unreleased]
 
 ### Planned
@@ -164,5 +187,6 @@ See `docs/MIGRATION_v1.0.md` for detailed migration instructions from pre-1.0 ve
 
 ## Version History
 
-- **v1.0.0** (2025-01-11): Initial release with full ALPR pipeline, Roboflow & Supabase integration
+- **v1.1.0** (2025-10-11): Migrated from EasyOCR to PaddleOCR for better accuracy
+- **v1.0.0** (2025-10-11): Initial release with full ALPR pipeline, Roboflow & Supabase integration
 

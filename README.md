@@ -1,13 +1,13 @@
 # ALPR System - Automatic License Plate Recognition
 
-A comprehensive Automatic License Plate Recognition system using YOLOv11, Roboflow, SORT tracking, and EasyOCR, with Supabase integration for data storage.
+A comprehensive Automatic License Plate Recognition system using YOLOv11, Roboflow, SORT tracking, and PaddleOCR, with Supabase integration for data storage.
 
 ## Features
 
 - **Vehicle Detection**: Detect cars, trucks, buses, and motorbikes using YOLOv11
 - **Vehicle Tracking**: Track vehicles across frames using SORT algorithm
 - **License Plate Detection**: Detect license plates using Roboflow's pre-trained models
-- **OCR**: Extract text from license plates using EasyOCR
+- **OCR**: Extract text from license plates using PaddleOCR
 - **Data Storage**: Store detection results in Supabase for analytics
 - **Visualization**: Real-time video visualization with annotations
 - **Export**: Save annotated videos and CSV reports

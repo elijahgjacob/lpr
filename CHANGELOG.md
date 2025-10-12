@@ -5,7 +5,7 @@ All notable changes to the ALPR System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-11
+## [1.0.0] - 2025-10-11
 
 ### Added
 
@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **License Plate Detection**: Dual-mode plate detection (Roboflow API or local YOLO model)
 - **OCR**: EasyOCR integration for license plate text recognition with validation
 - **Result Caching**: Smart caching to avoid redundant plate readings for tracked vehicles
+- **Timestamp Tracking**: ISO 8601 timestamp for every detection
+- **Version Tracking**: Release version recorded with every detection
+- **Enhanced Progress Display**: Real-time progress bar with ETA, FPS, and live statistics
 
 #### Integrations
 - **Roboflow Integration**: 
@@ -23,9 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Configurable workspace, project, and version
 - **Supabase Integration**:
   - Store test runs with metadata
-  - Track individual detections
+  - Track individual detections with timestamp and version
+  - **Batch Upload**: Queue detections in memory and upload in single transaction
   - Performance metrics storage
   - Database schema with views and functions
+  - Enhanced analytics with timestamp-based queries
 
 #### CLI Interface (`main.py`)
 - Comprehensive argument parsing
@@ -114,6 +119,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Feature branches with PRs
 - Clean commit history
 
+### Changed
+- **CSV Output**: Now includes `Timestamp` and `Version` columns (15 total columns vs. 13)
+- **Supabase Upload**: Changed from real-time individual inserts to batch upload at completion
+- **Progress Display**: Enhanced from simple counter to full progress bar with statistics
+
+### Breaking Changes
+- **CSV Format**: Scripts parsing CSV output must handle 2 new columns (Timestamp, Version)
+- **Supabase Schema**: `detections` table requires `timestamp` (TIMESTAMPTZ) and `version` (VARCHAR) columns
+- **Upload Behavior**: Detections now appear all at once after processing completes
+- **API**: `_store_detection()` method renamed to `_queue_detection()`, new `bulk_upload_detections()` method
+
+### Migration
+See `docs/MIGRATION_v1.0.md` for detailed migration instructions from pre-1.0 versions.
+
 ### Known Limitations
 - OCR accuracy varies with lighting and plate condition
 - Tracking may struggle with long occlusions
@@ -131,6 +150,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-10-11
+
+### Changed
+- **OCR Engine**: Migrated from EasyOCR to PaddleOCR for improved accuracy
+  - Better recognition of US license plates
+  - No API costs (runs locally)
+  - Comparable or better performance
+  - GPU acceleration when available
+
+### Technical Details
+- PaddleOCR v2.7+ with English language model
+- Drop-in replacement maintaining same output format
+- Enhanced text filtering with allowlist support
+- Improved confidence scoring
+
+### Benefits
+- **Zero Cost**: Completely free, no API limits
+- **Better Accuracy**: PaddleOCR often outperforms EasyOCR on English text
+- **Local Processing**: No cloud dependencies
+- **Fast**: Optimized C++ backend
+
+---
+
 ## [Unreleased]
 
 ### Planned
@@ -145,5 +187,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
-- **v1.0.0** (2025-01-11): Initial release with full ALPR pipeline, Roboflow & Supabase integration
+- **v1.1.0** (2025-10-11): Migrated from EasyOCR to PaddleOCR for better accuracy
+- **v1.0.0** (2025-10-11): Initial release with full ALPR pipeline, Roboflow & Supabase integration
 

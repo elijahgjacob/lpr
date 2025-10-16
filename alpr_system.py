@@ -105,11 +105,10 @@ class ALPRSystem:
         print("Initializing PaddleOCR...")
         gpu_available = torch.cuda.is_available()
         print(f"  GPU Available: {gpu_available}")
+        # PaddleOCR will automatically use GPU if available
         self.ocr_reader = PaddleOCR(
             use_angle_cls=True,
-            lang='en',
-            use_gpu=gpu_available,
-            show_log=False
+            lang='en'
         )
         
         # Initialize SORT tracker

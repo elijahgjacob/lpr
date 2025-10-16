@@ -245,6 +245,48 @@ pytest tests/ --cov=. --cov-report=html
 pytest tests/unit/test_utils.py -v
 ```
 
+## Evaluation & Metrics
+
+The system includes a comprehensive evaluation framework for measuring performance scientifically.
+
+### Create Golden Dataset
+
+Label frames to create ground truth data:
+
+```bash
+python scripts/create_golden_set.py \
+  --video videos/sample_traffic.mp4 \
+  --output data/golden/manifest.csv
+```
+
+### Run Evaluation
+
+Measure system performance against golden dataset:
+
+```bash
+python evaluation/eval.py \
+  --predictions results/output.csv \
+  --ground-truth data/golden/manifest.csv
+```
+
+### Key Metrics
+
+- **ERR (End-to-End Read Rate)**: % of frames with correct plate detection
+- **CER (Character Error Rate)**: Character-level accuracy using Levenshtein distance
+- **WER (Word Error Rate)**: Exact match rate
+- **Latency**: Mean, median, P95, P99 processing times
+- **Condition-based**: Performance by lighting (day/night/dusk)
+
+### Generate Visualizations
+
+```bash
+python evaluation/visualize.py \
+  --results results/metrics/evaluation_results.json \
+  --output-dir results/metrics/plots
+```
+
+See **[docs/EVALUATION.md](docs/EVALUATION.md)** for complete evaluation guide.
+
 ## Supabase Database Schema
 
 The system stores detection results in Supabase for analytics and historical tracking.

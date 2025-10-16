@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Plate Labeling Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .image-panel {
+            flex: 2;
+            padding: 30px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            border: 3px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .frame-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 7px;
+        }
+
+        .vehicle-box, .plate-box {
+            position: absolute;
+            border: 3px solid;
+            cursor: move;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(2px);
+        }
+
+        .vehicle-box {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .plate-box {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .vehicle-label, .plate-label {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .vehicle-label {
+            background: rgba(40, 167, 69, 0.9);
+        }
+
+        .plate-label {
+            background: rgba(220, 53, 69, 0.9);
+        }
+
+        .control-panel {
+            flex: 1;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #e9ecef;
+        }
+
+        .frame-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007bff;
+        }
+
+        .frame-info h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .frame-info p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+
+        .vehicle-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,193,7,0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #545b62);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,117,125,0.4);
+        }
+
+        .vehicle-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .vehicle-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .vehicle-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .vehicle-item h4 {
+            color: #28a745;
+            margin-bottom: 8px;
+        }
+
+        .vehicle-item p {
+            margin: 3px 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #6c757d;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 License Plate Labeling Interface</h1>
+            <p>Drag to draw bounding boxes, then enter license plate information</p>
+        </div>
+
+        <div class="main-content">
+            <div class="image-panel">
+                <div class="image-container" id="imageContainer">
+                    <img id="frameImage" class="frame-image" src="" alt="Frame to label">
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="instructions">
+                    <h3>📋 Instructions</h3>
+                    <ol>
+                        <li>Click and drag to draw vehicle bounding box (green)</li>
+                        <li>Click and drag to draw license plate bounding box (red)</li>
+                        <li>Enter license plate text and other details</li>
+                        <li>Click "Add Vehicle" to save this vehicle</li>
+                        <li>Use "Next Frame" when done with current frame</li>
+                    </ol>
+                </div>
+
+                <div class="frame-info" id="frameInfo">
+                    <h3>Frame Information</h3>
+                    <p><strong>Frame ID:</strong> <span id="currentFrameId">-</span></p>
+                    <p><strong>Progress:</strong> <span id="progressText">0 / 0</span></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="vehicle-form">
+                    <h3>🚗 Vehicle Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="plateText">License Plate Text *</label>
+                        <input type="text" id="plateText" placeholder="e.g., ABC1234" maxlength="10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type</label>
+                        <select id="vehicleType">
+                            <option value="">Select type...</option>
+                            <option value="car">Car</option>
+                            <option value="truck">Truck</option>
+                            <option value="motorcycle">Motorcycle</option>
+                            <option value="bus">Bus</option>
+                            <option value="van">Van</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plateState">Plate State</label>
+                        <input type="text" id="plateState" placeholder="e.g., CA, NY, TX" maxlength="2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plateConfidence">Plate Clarity (1-5)</label>
+                        <select id="plateConfidence">
+                            <option value="">Select clarity...</option>
+                            <option value="1">1 - Very blurry</option>
+                            <option value="2">2 - Blurry</option>
+                            <option value="3">3 - Somewhat clear</option>
+                            <option value="4">4 - Clear</option>
+                            <option value="5">5 - Very clear</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lightCondition">Light Condition</label>
+                        <select id="lightCondition">
+                            <option value="day">Day</option>
+                            <option value="night">Night</option>
+                            <option value="dawn">Dawn</option>
+                            <option value="dusk">Dusk</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weather">Weather</label>
+                        <select id="weather">
+                            <option value="clear">Clear</option>
+                            <option value="rainy">Rainy</option>
+                            <option value="cloudy">Cloudy</option>
+                            <option value="snowy">Snowy</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleNotes">Vehicle Notes</label>
+                        <textarea id="vehicleNotes" rows="3" placeholder="Any additional notes about this vehicle..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="addVehicle()">✅ Add Vehicle</button>
+                        <button class="btn btn-warning" onclick="clearCurrentBoxes()">🗑️ Clear Boxes</button>
+                    </div>
+                </div>
+
+                <div class="vehicle-list" id="vehicleList">
+                    <h3>📝 Labeled Vehicles</h3>
+                    <div id="vehiclesContainer">
+                        <p style="text-align: center; color: #6c757d; padding: 20px;">No vehicles labeled yet</p>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="previousFrame()">⬅️ Previous</button>
+                    <button class="btn btn-primary" onclick="nextFrame()">Next ➡️</button>
+                    <button class="btn btn-danger" onclick="saveAndExit()">💾 Save & Exit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global variables
+        let currentFrameIndex = 0;
+        let frames = [];
+        let vehicles = [];
+        let isDrawing = false;
+        let currentBox = null;
+        let startX, startY;
+        let isVehicleMode = true; // true for vehicle, false for plate
+
+        // Initialize the interface
+        async function init() {
+            try {
+                showNotification('Loading frames...', 'warning');
+                const response = await fetch('/api/frames');
+                frames = await response.json();
+                
+                if (frames.length === 0) {
+                    showNotification('No frames found!', 'error');
+                    return;
+                }
+
+                loadFrame(currentFrameIndex);
+                showNotification('Interface ready!', 'success');
+            } catch (error) {
+                console.error('Error initializing:', error);
+                showNotification('Error loading frames!', 'error');
+            }
+        }
+
+        // Load a specific frame
+        function loadFrame(index) {
+            if (index < 0 || index >= frames.length) return;
+
+            currentFrameIndex = index;
+            const frame = frames[currentFrameIndex];
+            
+            document.getElementById('frameImage').src = `/api/frame/${frame.frame_id}`;
+            document.getElementById('currentFrameId').textContent = frame.frame_id;
+            document.getElementById('progressText').textContent = `${index + 1} / ${frames.length}`;
+            
+            const progress = ((index + 1) / frames.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Clear previous vehicles for this frame
+            vehicles = [];
+            updateVehicleList();
+            clearCurrentBoxes();
+        }
+
+        // Add event listeners for drawing
+        document.getElementById('imageContainer').addEventListener('mousedown', startDrawing);
+        document.getElementById('imageContainer').addEventListener('mousemove', draw);
+        document.getElementById('imageContainer').addEventListener('mouseup', stopDrawing);
+
+        // Start drawing a bounding box
+        function startDrawing(e) {
+            const rect = document.getElementById('imageContainer').getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            isDrawing = true;
+
+            // Remove existing boxes of current type
+            const existingBoxes = document.querySelectorAll(isVehicleMode ? '.vehicle-box' : '.plate-box');
+            existingBoxes.forEach(box => box.remove());
+
+            // Create new box
+            currentBox = document.createElement('div');
+            currentBox.className = isVehicleMode ? 'vehicle-box' : 'plate-box';
+            currentBox.style.left = startX + 'px';
+            currentBox.style.top = startY + 'px';
+            currentBox.style.width = '0px';
+            currentBox.style.height = '0px';
+
+            // Add label
+            const label = document.createElement('div');
+            label.className = isVehicleMode ? 'vehicle-label' : 'plate-label';
+            label.textContent = isVehicleMode ? 'Vehicle' : 'License Plate';
+            currentBox.appendChild(label);
+
+            document.getElementById('imageContainer').appendChild(currentBox);
+        }
+
+        // Draw bounding box
+        function draw(e) {
+            if (!isDrawing || !currentBox) return;
+
+            const rect = document.getElementById('imageContainer').getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+
+            const width = Math.abs(currentX - startX);
+            const height = Math.abs(currentY - startY);
+            const left = Math.min(startX, currentX);
+            const top = Math.min(startY, currentY);
+
+            currentBox.style.left = left + 'px';
+            currentBox.style.top = top + 'px';
+            currentBox.style.width = width + 'px';
+            currentBox.style.height = height + 'px';
+        }
+
+        // Stop drawing
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            currentBox = null;
+        }
+
+        // Toggle between vehicle and plate mode
+        function toggleMode() {
+            isVehicleMode = !isVehicleMode;
+            showNotification(`Now drawing: ${isVehicleMode ? 'Vehicle' : 'License Plate'}`, 'warning');
+        }
+
+        // Add vehicle to the list
+        function addVehicle() {
+            const plateText = document.getElementById('plateText').value.trim();
+            if (!plateText) {
+                showNotification('Please enter license plate text!', 'error');
+                return;
+            }
+
+            const vehicleBox = document.querySelector('.vehicle-box');
+            const plateBox = document.querySelector('.plate-box');
+
+            if (!vehicleBox || !plateBox) {
+                showNotification('Please draw both vehicle and license plate boxes!', 'error');
+                return;
+            }
+
+            const vehicle = {
+                vehicle_number: vehicles.length + 1,
+                plate_text: plateText,
+                vehicle_type: document.getElementById('vehicleType').value,
+                plate_state: document.getElementById('plateState').value.toUpperCase(),
+                plate_confidence: document.getElementById('plateConfidence').value,
+                light_condition: document.getElementById('lightCondition').value,
+                weather: document.getElementById('weather').value,
+                vehicle_notes: document.getElementById('vehicleNotes').value,
+                vehicle_box: {
+                    x: parseInt(vehicleBox.style.left),
+                    y: parseInt(vehicleBox.style.top),
+                    width: parseInt(vehicleBox.style.width),
+                    height: parseInt(vehicleBox.style.height)
+                },
+                plate_box: {
+                    x: parseInt(plateBox.style.left),
+                    y: parseInt(plateBox.style.top),
+                    width: parseInt(plateBox.style.width),
+                    height: parseInt(plateBox.style.height)
+                }
+            };
+
+            vehicles.push(vehicle);
+            updateVehicleList();
+            clearForm();
+            clearCurrentBoxes();
+            showNotification('Vehicle added successfully!', 'success');
+        }
+
+        // Update the vehicle list display
+        function updateVehicleList() {
+            const container = document.getElementById('vehiclesContainer');
+            
+            if (vehicles.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;">No vehicles labeled yet</p>';
+                return;
+            }
+
+            container.innerHTML = vehicles.map((vehicle, index) => `
+                <div class="vehicle-item">
+                    <h4>Vehicle #${vehicle.vehicle_number}</h4>
+                    <p><strong>Plate:</strong> ${vehicle.plate_text}</p>
+                    <p><strong>Type:</strong> ${vehicle.vehicle_type || 'Not specified'}</p>
+                    <p><strong>State:</strong> ${vehicle.plate_state || 'Not specified'}</p>
+                    <p><strong>Confidence:</strong> ${vehicle.plate_confidence || 'Not specified'}/5</p>
+                    <button class="btn btn-danger" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;" onclick="removeVehicle(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        // Remove a vehicle
+        function removeVehicle(index) {
+            vehicles.splice(index, 1);
+            updateVehicleList();
+            showNotification('Vehicle removed!', 'warning');
+        }
+
+        // Clear current bounding boxes
+        function clearCurrentBoxes() {
+            document.querySelectorAll('.vehicle-box, .plate-box').forEach(box => box.remove());
+        }
+
+        // Clear the form
+        function clearForm() {
+            document.getElementById('plateText').value = '';
+            document.getElementById('vehicleType').value = '';
+            document.getElementById('plateState').value = '';
+            document.getElementById('plateConfidence').value = '';
+            document.getElementById('vehicleNotes').value = '';
+        }
+
+        // Navigate to previous frame
+        function previousFrame() {
+            if (currentFrameIndex > 0) {
+                saveFrameData();
+                loadFrame(currentFrameIndex - 1);
+            }
+        }
+
+        // Navigate to next frame
+        function nextFrame() {
+            if (currentFrameIndex < frames.length - 1) {
+                saveFrameData();
+                loadFrame(currentFrameIndex + 1);
+            } else {
+                showNotification('This is the last frame!', 'warning');
+            }
+        }
+
+        // Save current frame data
+        async function saveFrameData() {
+            if (vehicles.length === 0) return;
+
+            try {
+                const frameData = {
+                    frame_id: frames[currentFrameIndex].frame_id,
+                    vehicles: vehicles
+                };
+
+                await fetch('/api/save-frame', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(frameData)
+                });
+
+                showNotification('Frame data saved!', 'success');
+            } catch (error) {
+                console.error('Error saving frame:', error);
+                showNotification('Error saving frame data!', 'error');
+            }
+        }
+
+        // Save and exit
+        async function saveAndExit() {
+            await saveFrameData();
+            
+            try {
+                await fetch('/api/export-csv', {
+                    method: 'POST'
+                });
+                
+                showNotification('All data exported to CSV!', 'success');
+                setTimeout(() => {
+                    window.close();
+                }, 2000);
+            } catch (error) {
+                console.error('Error exporting:', error);
+                showNotification('Error exporting data!', 'error');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') previousFrame();
+            if (e.key === 'ArrowRight') nextFrame();
+            if (e.key === 'v' || e.key === 'V') {
+                isVehicleMode = true;
+                showNotification('Vehicle mode', 'warning');
+            }
+            if (e.key === 'p' || e.key === 'P') {
+                isVehicleMode = false;
+                showNotification('Plate mode', 'warning');
+            }
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

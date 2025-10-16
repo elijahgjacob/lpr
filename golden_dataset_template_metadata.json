@@ -1,0 +1,45 @@
+{
+  "video_source": "main_video.mp4",
+  "video_info": {
+    "total_frames": 1800,
+    "fps": 30.0,
+    "width": 3840,
+    "height": 2160,
+    "duration": 60.0
+  },
+  "extraction_date": "2025-10-15T21:15:16.172292",
+  "total_frames_extracted": 18,
+  "frame_interval_used": "50",
+  "template_columns": [
+    "frame_id",
+    "vehicle_number",
+    "video_source",
+    "frame_path",
+    "has_vehicle",
+    "vehicle_type",
+    "plate_text_gt",
+    "plate_confidence",
+    "plate_state",
+    "plate_type",
+    "light_condition",
+    "weather",
+    "vehicle_notes",
+    "frame_notes",
+    "labeled_at",
+    "labeled_by"
+  ],
+  "instructions": {
+    "vehicle_number": "1-5, indicating which vehicle in the frame this row represents",
+    "has_vehicle": "Y if this vehicle row is used (vehicle visible), N if unused",
+    "vehicle_type": "car/truck/motorcycle/bus/van for the specific vehicle",
+    "plate_text_gt": "License plate text exactly as it appears (e.g., ABC1234)",
+    "plate_confidence": "1=very blurry/unclear, 5=crystal clear for this plate",
+    "plate_state": "US state abbreviation if visible (e.g., CA, NY, TX)",
+    "plate_type": "standard/vanity/commercial/temporary for this plate",
+    "light_condition": "day/night/dawn/dusk (fill for vehicle_number=1 only)",
+    "weather": "clear/rainy/cloudy/snowy (fill for vehicle_number=1 only)",
+    "vehicle_notes": "Notes specific to this individual vehicle",
+    "frame_notes": "Notes about the overall frame (fill for vehicle_number=1 only)",
+    "usage": "Each frame has 5 rows. Use only the rows needed for vehicles in that frame."
+  }
+}

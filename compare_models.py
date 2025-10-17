@@ -88,7 +88,10 @@ def run_model_evaluation(
     
     try:
         # Create detector configuration
-        detector_config = create_detector_config(model_config['config'])
+        # Add model_name to config for factory function
+        config_with_name = model_config['config'].copy()
+        config_with_name['model_name'] = model_config['name']
+        detector_config = create_detector_config(config_with_name, model_config['type'])
         print(f"Created detector config: {detector_config}")
         
         # Initialize ALPR system with the detector config

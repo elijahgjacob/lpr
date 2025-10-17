@@ -390,12 +390,13 @@ class RoboflowDetectorConfig(PlateDetectorConfig):
         }
 
 
-def create_detector_config(config_dict: Dict[str, Any]) -> PlateDetectorConfig:
+def create_detector_config(config_dict: Dict[str, Any], config_type: Optional[str] = None) -> PlateDetectorConfig:
     """
     Factory function to create detector config from dictionary.
     
     Args:
         config_dict: Dictionary containing configuration parameters
+        config_type: Optional type override (if not provided in config_dict)
         
     Returns:
         Appropriate PlateDetectorConfig instance
@@ -404,29 +405,29 @@ def create_detector_config(config_dict: Dict[str, Any]) -> PlateDetectorConfig:
         ValueError: If configuration type is not supported
         KeyError: If required configuration parameters are missing
     """
-    config_type = config_dict.get("type")
+    config_type = config_type or config_dict.get("type")
     
     if config_type == "local_yolo":
-        required_keys = ["model_name", "model_path"]
+        required_keys = ["model_path"]
         missing_keys = [key for key in required_keys if key not in config_dict]
         if missing_keys:
             raise KeyError(f"Missing required keys for local_yolo config: {missing_keys}")
         
         return LocalYOLODetectorConfig(
-            model_name=config_dict["model_name"],
+            model_name=config_dict.get("model_name", "Local YOLO Model"),
             model_path=config_dict["model_path"],
             confidence_threshold=config_dict.get("confidence_threshold", 0.25),
             device=config_dict.get("device")
         )
     
     elif config_type == "runpod_yolo":
-        required_keys = ["model_name", "runpod_endpoint", "model_path"]
+        required_keys = ["runpod_endpoint", "model_path"]
         missing_keys = [key for key in required_keys if key not in config_dict]
         if missing_keys:
             raise KeyError(f"Missing required keys for runpod_yolo config: {missing_keys}")
         
         return RunPodYOLODetectorConfig(
-            model_name=config_dict["model_name"],
+            model_name=config_dict.get("model_name", "RunPod YOLO Model"),
             runpod_endpoint=config_dict["runpod_endpoint"],
             model_path=config_dict["model_path"],
             confidence_threshold=config_dict.get("confidence_threshold", 0.25),
@@ -453,35 +454,19 @@ def create_detector_config(config_dict: Dict[str, Any]) -> PlateDetectorConfig:
         raise ValueError(f"Unsupported detector type: {config_type}")
 
 
-# Example configurations for testing
+# Example configurations for testing (note: these require actual model files to work)
+# These are provided as reference - use model_registry.json for actual comparisons
 EXAMPLE_CONFIGS = {
-    "yolo_baseline": LocalYOLODetectorConfig(
-        model_name="YOLO Baseline",
-        model_path="models/license_plate_detector.pt",
-        confidence_threshold=0.25
-    ),
-    "yolo_high_conf": LocalYOLODetectorConfig(
-        model_name="YOLO High Confidence", 
-        model_path="models/license_plate_detector.pt",
-        confidence_threshold=0.5
-    ),
-    "yolo_low_conf": LocalYOLODetectorConfig(
-        model_name="YOLO Low Confidence",
-        model_path="models/license_plate_detector.pt", 
-        confidence_threshold=0.1
-    ),
-    "runpod_yolo_fast": RunPodYOLODetectorConfig(
-        model_name="RunPod YOLO Fast",
-        runpod_endpoint="https://api.runpod.ai/v2/your-endpoint-id/run",
-        model_path="/workspace/models/yolo11n.pt",
-        confidence_threshold=0.25,
-        timeout=15
-    ),
-    "runpod_yolo_accurate": RunPodYOLODetectorConfig(
-        model_name="RunPod YOLO Accurate",
-        runpod_endpoint="https://api.runpod.ai/v2/your-endpoint-id/run", 
-        model_path="/workspace/models/yolo11x.pt",
-        confidence_threshold=0.5,
-        timeout=30
-    )
+    "yolo_baseline": {
+        "model_name": "YOLO Baseline",
+        "model_path": "models/license_plate_detector.pt",
+        "confidence_threshold": 0.25
+    },
+    "runpod_yolo_fast": {
+        "model_name": "RunPod YOLO Fast",
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/yolo11n.pt",
+        "confidence_threshold": 0.25,
+        "timeout": 15
+    }
 }

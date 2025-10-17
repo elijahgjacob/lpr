@@ -368,23 +368,31 @@ class ALPRSystem:
         # Preprocess image
         processed = utils.preprocess_plate_image(plate_crop)
         
+        # Convert back to 3D for PaddleOCR
+        if len(processed.shape) == 2:
+            processed = cv2.cvtColor(processed, cv2.COLOR_GRAY2BGR)
+        
         # Run OCR with PaddleOCR
         try:
             # PaddleOCR returns: [[[bbox], (text, confidence)], ...]
-            results = self.ocr_reader.ocr(processed, cls=True)
+            results = self.ocr_reader.ocr(processed)
             
-            if not results or not results[0]:
+            if not results or not isinstance(results, list) or not results[0]:
                 return None, 0.0
             
-            # Extract all text and confidences
-            texts = []
-            confidences = []
-            
-            for line in results[0]:
-                if line:
-                    text = line[1][0]  # (text, confidence)[0]
-                    conf = line[1][1]  # (text, confidence)[1]
-                    
+            # Handle new PaddleOCR format (dictionary)
+            if isinstance(results[0], dict):
+                rec_texts = results[0].get('rec_texts', [])
+                rec_scores = results[0].get('rec_scores', [])
+                
+                if not rec_texts:
+                    return None, 0.0
+                
+                # Combine all texts and get average confidence
+                texts = []
+                confidences = []
+                
+                for text, conf in zip(rec_texts, rec_scores):
                     # Filter with allowlist
                     filtered_text = ''.join(
                         c for c in text if c in config.OCR_ALLOWLIST
@@ -393,6 +401,25 @@ class ALPRSystem:
                     if filtered_text:
                         texts.append(filtered_text)
                         confidences.append(conf)
+                        
+            else:
+                # Handle old format (list of lists)
+                texts = []
+                confidences = []
+                
+                for line in results[0]:
+                    if line and len(line) >= 2:
+                        text = line[1][0] if len(line[1]) > 0 else ""
+                        conf = line[1][1] if len(line[1]) > 1 else 0.0
+                        
+                        # Filter with allowlist
+                        filtered_text = ''.join(
+                            c for c in text if c in config.OCR_ALLOWLIST
+                        )
+                        
+                        if filtered_text:
+                            texts.append(filtered_text)
+                            confidences.append(conf)
             
             if not texts:
                 return None, 0.0

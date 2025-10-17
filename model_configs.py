@@ -132,6 +132,196 @@ class LocalYOLODetectorConfig(PlateDetectorConfig):
         return f"LocalYOLO(name='{self.model_name}', path='{self.model_path}', conf={self.confidence_threshold})"
 
 
+class RunPodYOLODetectorConfig(PlateDetectorConfig):
+    """
+    Configuration for RunPod-based YOLO plate detector.
+    
+    This configuration supports running YOLO models on RunPod cloud infrastructure
+    for license plate detection, allowing for GPU acceleration and scalable processing.
+    """
+    
+    def __init__(
+        self,
+        model_name: str,
+        runpod_endpoint: str,
+        model_path: str,
+        confidence_threshold: float = 0.25,
+        api_key: Optional[str] = None,
+        timeout: int = 30
+    ):
+        """
+        Initialize RunPod YOLO detector configuration.
+        
+        Args:
+            model_name: Human-readable name for this model
+            runpod_endpoint: RunPod API endpoint URL
+            model_path: Path to the YOLO model file on RunPod
+            confidence_threshold: Minimum confidence score for detections
+            api_key: RunPod API key (if not provided, will use environment variable)
+            timeout: Request timeout in seconds
+        """
+        super().__init__(model_name, confidence_threshold)
+        self.runpod_endpoint = runpod_endpoint
+        self.model_path = model_path
+        self.api_key = api_key
+        self.timeout = timeout
+    
+    def get_detector(self):
+        """
+        Get configured RunPod YOLO detector instance.
+        
+        Returns:
+            RunPod YOLO client instance for license plate detection
+        """
+        try:
+            import requests
+        except ImportError:
+            raise RuntimeError(
+                "requests not installed. Run: pip install requests"
+            )
+        
+        return RunPodYOLOClient(
+            endpoint=self.runpod_endpoint,
+            model_path=self.model_path,
+            confidence_threshold=self.confidence_threshold,
+            api_key=self.api_key,
+            timeout=self.timeout
+        )
+    
+    def get_config_dict(self) -> Dict[str, Any]:
+        """
+        Get configuration as dictionary.
+        
+        Returns:
+            Dictionary representation of the configuration
+        """
+        return {
+            "type": "runpod_yolo",
+            "model_name": self.model_name,
+            "runpod_endpoint": self.runpod_endpoint,
+            "model_path": self.model_path,
+            "confidence_threshold": self.confidence_threshold,
+            "api_key": self.api_key,
+            "timeout": self.timeout
+        }
+
+
+class RunPodYOLOClient:
+    """
+    Client for RunPod YOLO inference.
+    
+    Handles communication with RunPod API for YOLO model inference.
+    """
+    
+    def __init__(
+        self,
+        endpoint: str,
+        model_path: str,
+        confidence_threshold: float = 0.25,
+        api_key: Optional[str] = None,
+        timeout: int = 30
+    ):
+        """
+        Initialize RunPod YOLO client.
+        
+        Args:
+            endpoint: RunPod API endpoint URL
+            model_path: Path to YOLO model on RunPod
+            confidence_threshold: Confidence threshold for detections
+            api_key: RunPod API key
+            timeout: Request timeout in seconds
+        """
+        import requests
+        import os
+        
+        self.endpoint = endpoint
+        self.model_path = model_path
+        self.confidence_threshold = confidence_threshold
+        self.api_key = api_key or os.getenv("RUNPOD_API_KEY")
+        self.timeout = timeout
+        
+        if not self.api_key:
+            raise ValueError("RunPod API key not provided and RUNPOD_API_KEY environment variable not set")
+        
+        self.headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+    
+    def predict(self, image_data: bytes) -> List[Dict[str, Any]]:
+        """
+        Run YOLO inference on RunPod.
+        
+        Args:
+            image_data: Image data as bytes
+            
+        Returns:
+            List of detection dictionaries with bbox, confidence, class_id
+        """
+        import base64
+        import requests
+        
+        # Encode image to base64
+        image_b64 = base64.b64encode(image_data).decode('utf-8')
+        
+        # Prepare request payload
+        payload = {
+            "input": {
+                "image": image_b64,
+                "model_path": self.model_path,
+                "confidence_threshold": self.confidence_threshold
+            }
+        }
+        
+        try:
+            response = requests.post(
+                self.endpoint,
+                headers=self.headers,
+                json=payload,
+                timeout=self.timeout
+            )
+            response.raise_for_status()
+            
+            result = response.json()
+            
+            # Parse RunPod response format
+            if "output" in result and "detections" in result["output"]:
+                return result["output"]["detections"]
+            else:
+                return []
+                
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"RunPod API request failed: {e}")
+    
+    def __call__(self, image_data: bytes, verbose: bool = False):
+        """
+        Callable interface for compatibility with YOLO models.
+        
+        Args:
+            image_data: Image data as bytes
+            verbose: Whether to print verbose output
+            
+        Returns:
+            Mock YOLO results object for compatibility
+        """
+        detections = self.predict(image_data)
+        
+        # Create mock YOLO results object for compatibility
+        class MockBoxes:
+            def __init__(self, detections):
+                self.detections = detections
+                self.conf = [d.get("confidence", 0.0) for d in detections]
+                self.xyxy = [d.get("bbox", [0, 0, 0, 0]) for d in detections]
+                self.cls = [d.get("class_id", 0) for d in detections]
+        
+        class MockResults:
+            def __init__(self, detections):
+                self.boxes = MockBoxes(detections)
+                self.detections = detections
+        
+        return [MockResults(detections)]
+
+
 # Future: RoboflowDetectorConfig class can be added here when Roboflow integration is needed
 class RoboflowDetectorConfig(PlateDetectorConfig):
     """
@@ -229,6 +419,21 @@ def create_detector_config(config_dict: Dict[str, Any]) -> PlateDetectorConfig:
             device=config_dict.get("device")
         )
     
+    elif config_type == "runpod_yolo":
+        required_keys = ["model_name", "runpod_endpoint", "model_path"]
+        missing_keys = [key for key in required_keys if key not in config_dict]
+        if missing_keys:
+            raise KeyError(f"Missing required keys for runpod_yolo config: {missing_keys}")
+        
+        return RunPodYOLODetectorConfig(
+            model_name=config_dict["model_name"],
+            runpod_endpoint=config_dict["runpod_endpoint"],
+            model_path=config_dict["model_path"],
+            confidence_threshold=config_dict.get("confidence_threshold", 0.25),
+            api_key=config_dict.get("api_key"),
+            timeout=config_dict.get("timeout", 30)
+        )
+    
     elif config_type == "roboflow":
         required_keys = ["model_name", "workspace", "project", "version"]
         missing_keys = [key for key in required_keys if key not in config_dict]
@@ -264,5 +469,19 @@ EXAMPLE_CONFIGS = {
         model_name="YOLO Low Confidence",
         model_path="models/license_plate_detector.pt", 
         confidence_threshold=0.1
+    ),
+    "runpod_yolo_fast": RunPodYOLODetectorConfig(
+        model_name="RunPod YOLO Fast",
+        runpod_endpoint="https://api.runpod.ai/v2/your-endpoint-id/run",
+        model_path="/workspace/models/yolo11n.pt",
+        confidence_threshold=0.25,
+        timeout=15
+    ),
+    "runpod_yolo_accurate": RunPodYOLODetectorConfig(
+        model_name="RunPod YOLO Accurate",
+        runpod_endpoint="https://api.runpod.ai/v2/your-endpoint-id/run", 
+        model_path="/workspace/models/yolo11x.pt",
+        confidence_threshold=0.5,
+        timeout=30
     )
 }

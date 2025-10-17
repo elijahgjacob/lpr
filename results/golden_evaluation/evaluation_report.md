@@ -54,7 +54,7 @@ The ALPR system successfully detected license plates in 11 out of 17 frames, fin
 
 | Frame | Ground Truth Labels | Detections | Status |
 |-------|-------------------|------------|---------|
-| 0 | 3 | 0 | Missed all |
+| 0 |3 | 0 | Missed all |
 | 100 | 3 | 0 | Missed all |
 | 200 | 2 | 2 | Partial matches |
 | 300 | 2 | 1 | Partial match |
@@ -121,3 +121,4 @@ The golden dataset provides a solid foundation for continued system improvement 
 *Report generated on: $(date)*
 *Evaluation script: evaluate_golden_dataset.py*
 *Ground truth source: labeling_interface/detailed_labels_export.csv*
+

@@ -47,6 +47,7 @@ except ImportError:
 import config
 import utils
 from sort import Sort
+from model_configs import PlateDetectorConfig
 
 
 class ALPRSystem:
@@ -60,7 +61,8 @@ class ALPRSystem:
         vehicle_model_path: Optional[str] = None,
         plate_model_path: Optional[str] = None,
         use_roboflow: Optional[bool] = None,
-        enable_supabase: Optional[bool] = None
+        enable_supabase: Optional[bool] = None,
+        plate_detector_config: Optional[PlateDetectorConfig] = None
     ):
         """
         Initialize the ALPR system.
@@ -70,6 +72,7 @@ class ALPRSystem:
             plate_model_path: Path to license plate YOLO model (if not using Roboflow)
             use_roboflow: Override config to use Roboflow API
             enable_supabase: Override config to enable Supabase storage
+            plate_detector_config: Optional PlateDetectorConfig for pluggable plate detection
             
         Raises:
             RuntimeError: If required dependencies are not installed
@@ -94,12 +97,8 @@ class ALPRSystem:
         self.vehicle_detector = YOLO(vehicle_model_path or config.VEHICLE_MODEL_PATH)
         
         # Initialize license plate detector
-        if self.use_roboflow:
-            print("Initializing Roboflow for license plate detection...")
-            self._init_roboflow_detector()
-        else:
-            print(f"Loading local plate detection model: {plate_model_path or config.PLATE_MODEL_PATH}")
-            self.plate_detector = YOLO(plate_model_path or config.PLATE_MODEL_PATH)
+        self.plate_detector_config = plate_detector_config
+        self._init_plate_detector(plate_model_path)
         
         # Initialize OCR
         print("Initializing PaddleOCR...")
@@ -163,6 +162,27 @@ class ALPRSystem:
             is_valid, error = utils.validate_supabase_config()
             if not is_valid:
                 raise ValueError(f"Invalid Supabase configuration: {error}")
+    
+    def _init_plate_detector(self, plate_model_path: Optional[str] = None):
+        """
+        Initialize license plate detector using either config-based or legacy approach.
+        
+        Args:
+            plate_model_path: Path to plate model (used for legacy initialization)
+        """
+        if self.plate_detector_config is not None:
+            # Use pluggable configuration
+            print(f"Initializing plate detector from config: {self.plate_detector_config}")
+            self.plate_detector = self.plate_detector_config.get_detector()
+            print(f"  Plate detector loaded: {self.plate_detector_config.model_name}")
+        else:
+            # Use legacy initialization for backward compatibility
+            if self.use_roboflow:
+                print("Initializing Roboflow for license plate detection...")
+                self._init_roboflow_detector()
+            else:
+                print(f"Loading local plate detection model: {plate_model_path or config.PLATE_MODEL_PATH}")
+                self.plate_detector = YOLO(plate_model_path or config.PLATE_MODEL_PATH)
     
     def _init_roboflow_detector(self):
         """Initialize Roboflow license plate detector."""
@@ -306,9 +326,12 @@ class ALPRSystem:
         if self.use_roboflow:
             # Use Roboflow API
             try:
+                # Use config threshold if available, otherwise use global config
+                threshold = (self.plate_detector_config.confidence_threshold 
+                           if self.plate_detector_config else config.PLATE_CONFIDENCE_THRESHOLD)
                 predictions = self.plate_detector.predict(
                     vehicle_crop, 
-                    confidence=int(config.PLATE_CONFIDENCE_THRESHOLD * 100)
+                    confidence=int(threshold * 100)
                 ).json()
                 
                 # Convert Roboflow predictions
@@ -329,9 +352,13 @@ class ALPRSystem:
             # Use local YOLO model
             results = self.plate_detector(vehicle_crop, verbose=False)[0]
             
+            # Use config threshold if available, otherwise use global config
+            threshold = (self.plate_detector_config.confidence_threshold 
+                       if self.plate_detector_config else config.PLATE_CONFIDENCE_THRESHOLD)
+            
             for box in results.boxes:
                 confidence = float(box.conf[0])
-                if confidence >= config.PLATE_CONFIDENCE_THRESHOLD:
+                if confidence >= threshold:
                     px1, py1, px2, py2 = box.xyxy[0].cpu().numpy()
                     # Convert to full frame coordinates
                     plates.append((

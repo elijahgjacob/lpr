@@ -1,0 +1,12 @@
+{
+  "total_ground_truth_labels": 35,
+  "correct_detections": 0,
+  "accuracy": 0.0,
+  "average_confidence_correct": 0.0,
+  "exact_matches": 0,
+  "partial_matches": 20,
+  "no_matches": 15,
+  "exact_match_rate": 0.0,
+  "partial_match_rate": 0.5714285714285714,
+  "no_match_rate": 0.42857142857142855
+}

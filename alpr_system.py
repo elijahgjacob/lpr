@@ -16,6 +16,12 @@ from typing import List, Tuple, Optional, Dict, Any
 from datetime import datetime
 import uuid
 
+# Version info
+try:
+    from __init__ import __version__
+except ImportError:
+    __version__ = "1.0.0"
+
 # Core dependencies
 try:
     from ultralytics import YOLO
@@ -23,9 +29,9 @@ except ImportError:
     YOLO = None
 
 try:
-    import easyocr
+    from paddleocr import PaddleOCR
 except ImportError:
-    easyocr = None
+    PaddleOCR = None
 
 try:
     from roboflow import Roboflow
@@ -96,10 +102,14 @@ class ALPRSystem:
             self.plate_detector = YOLO(plate_model_path or config.PLATE_MODEL_PATH)
         
         # Initialize OCR
-        print("Initializing EasyOCR...")
+        print("Initializing PaddleOCR...")
         gpu_available = torch.cuda.is_available()
         print(f"  GPU Available: {gpu_available}")
-        self.ocr_reader = easyocr.Reader(config.OCR_LANGUAGES, gpu=gpu_available)
+        # PaddleOCR will automatically use GPU if available
+        self.ocr_reader = PaddleOCR(
+            use_angle_cls=True,
+            lang='en'
+        )
         
         # Initialize SORT tracker
         print("Initializing SORT tracker...")
@@ -115,6 +125,7 @@ class ALPRSystem:
         # Initialize Supabase if enabled
         self.supabase_client: Optional[Client] = None
         self.current_test_run_id: Optional[str] = None
+        self.pending_detections: List[Dict[str, Any]] = []  # Batch storage for Supabase
         if self.enable_supabase:
             print("Initializing Supabase connection...")
             self._init_supabase()
@@ -134,8 +145,8 @@ class ALPRSystem:
         """Check if required dependencies are installed."""
         if YOLO is None:
             raise RuntimeError("ultralytics not installed. Run: pip install ultralytics")
-        if easyocr is None:
-            raise RuntimeError("easyocr not installed. Run: pip install easyocr")
+        if PaddleOCR is None:
+            raise RuntimeError("paddleocr not installed. Run: pip install paddleocr")
         if self.use_roboflow and Roboflow is None:
             raise RuntimeError("roboflow not installed. Run: pip install roboflow")
         if self.enable_supabase and Client is None:
@@ -357,26 +368,71 @@ class ALPRSystem:
         # Preprocess image
         processed = utils.preprocess_plate_image(plate_crop)
         
-        # Run OCR
+        # Convert back to 3D for PaddleOCR
+        if len(processed.shape) == 2:
+            processed = cv2.cvtColor(processed, cv2.COLOR_GRAY2BGR)
+        
+        # Run OCR with PaddleOCR
         try:
-            results = self.ocr_reader.readtext(
-                processed,
-                allowlist=config.OCR_ALLOWLIST,
-                detail=1
-            )
+            # PaddleOCR returns: [[[bbox], (text, confidence)], ...]
+            results = self.ocr_reader.ocr(processed)
             
-            if not results:
+            if not results or not isinstance(results, list) or not results[0]:
                 return None, 0.0
             
-            # Get best result
-            best_result = max(results, key=lambda x: x[2])  # Sort by confidence
-            text, confidence = best_result[1], best_result[2]
+            # Handle new PaddleOCR format (dictionary)
+            if isinstance(results[0], dict):
+                rec_texts = results[0].get('rec_texts', [])
+                rec_scores = results[0].get('rec_scores', [])
+                
+                if not rec_texts:
+                    return None, 0.0
+                
+                # Combine all texts and get average confidence
+                texts = []
+                confidences = []
+                
+                for text, conf in zip(rec_texts, rec_scores):
+                    # Filter with allowlist
+                    filtered_text = ''.join(
+                        c for c in text if c in config.OCR_ALLOWLIST
+                    )
+                    
+                    if filtered_text:
+                        texts.append(filtered_text)
+                        confidences.append(conf)
+                        
+            else:
+                # Handle old format (list of lists)
+                texts = []
+                confidences = []
+                
+                for line in results[0]:
+                    if line and len(line) >= 2:
+                        text = line[1][0] if len(line[1]) > 0 else ""
+                        conf = line[1][1] if len(line[1]) > 1 else 0.0
+                        
+                        # Filter with allowlist
+                        filtered_text = ''.join(
+                            c for c in text if c in config.OCR_ALLOWLIST
+                        )
+                        
+                        if filtered_text:
+                            texts.append(filtered_text)
+                            confidences.append(conf)
+            
+            if not texts:
+                return None, 0.0
+            
+            # Combine results
+            final_text = ''.join(texts).strip()
+            avg_confidence = sum(confidences) / len(confidences)
             
             # Format and validate
-            formatted_text = utils.format_license_plate(text)
+            formatted_text = utils.format_license_plate(final_text)
             
-            if confidence >= config.OCR_CONFIDENCE_THRESHOLD and utils.validate_license_plate(formatted_text):
-                return formatted_text, confidence
+            if avg_confidence >= config.OCR_CONFIDENCE_THRESHOLD and utils.validate_license_plate(formatted_text):
+                return formatted_text, avg_confidence
             
         except Exception as e:
             print(f"⚠ OCR failed: {e}")
@@ -439,9 +495,9 @@ class ALPRSystem:
                             "first_seen": frame_number,
                         }
                         
-                        # Store in Supabase
+                        # Queue detection for batch Supabase upload
                         if self.enable_supabase and self.current_test_run_id:
-                            self._store_detection(frame_number, vehicle_id, plate_text, confidence, plate_bbox)
+                            self._queue_detection(frame_number, vehicle_id, plate_text, confidence, plate_bbox)
             
             # Add to results
             cached_plate = self.vehicle_plates.get(vehicle_id)
@@ -453,6 +509,8 @@ class ALPRSystem:
                     "plate_text": cached_plate["text"],
                     "plate_bbox": cached_plate["bbox"],
                     "confidence": cached_plate["confidence"],
+                    "timestamp": datetime.now().isoformat(),
+                    "version": __version__,
                 })
             
             # Visualize if requested
@@ -465,7 +523,7 @@ class ALPRSystem:
         
         return frame, results
     
-    def _store_detection(
+    def _queue_detection(
         self,
         frame_number: int,
         vehicle_id: int,
@@ -473,25 +531,41 @@ class ALPRSystem:
         confidence: float,
         bbox: Tuple[float, float, float, float]
     ):
-        """Store detection in Supabase."""
-        if not self.supabase_client or not self.current_test_run_id:
+        """Queue detection for batch upload to Supabase."""
+        if not self.current_test_run_id:
+            return
+        
+        data = {
+            "test_run_id": self.current_test_run_id,
+            "frame_number": frame_number,
+            "vehicle_id": vehicle_id,
+            "plate_text": plate_text,
+            "confidence": confidence,
+            "bbox_x1": bbox[0],
+            "bbox_y1": bbox[1],
+            "bbox_x2": bbox[2],
+            "bbox_y2": bbox[3],
+            "timestamp": datetime.now().isoformat(),
+            "version": __version__,
+        }
+        self.pending_detections.append(data)
+    
+    def bulk_upload_detections(self):
+        """
+        Upload all pending detections to Supabase in one batch.
+        Call this at the end of processing.
+        """
+        if not self.enable_supabase or not self.supabase_client or not self.pending_detections:
             return
         
         try:
-            data = {
-                "test_run_id": self.current_test_run_id,
-                "frame_number": frame_number,
-                "vehicle_id": vehicle_id,
-                "plate_text": plate_text,
-                "confidence": confidence,
-                "bbox_x1": bbox[0],
-                "bbox_y1": bbox[1],
-                "bbox_x2": bbox[2],
-                "bbox_y2": bbox[3],
-            }
-            self.supabase_client.table("detections").insert(data).execute()
+            print(f"\n📤 Uploading {len(self.pending_detections)} detections to Supabase...")
+            # Supabase supports batch inserts
+            self.supabase_client.table("detections").insert(self.pending_detections).execute()
+            print(f"  ✓ Successfully uploaded {len(self.pending_detections)} detections")
+            self.pending_detections.clear()
         except Exception as e:
-            print(f"⚠ Failed to store detection: {e}")
+            print(f"  ⚠ Failed to bulk upload detections: {e}")
     
     def get_statistics(self) -> Dict[str, Any]:
         """

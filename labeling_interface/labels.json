@@ -1,0 +1,874 @@
+{
+  "0": {
+    "frame_id": 0,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "NAI3NRU",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 166,
+          "y": 311,
+          "width": 151,
+          "height": 122
+        },
+        "plate_box": {
+          "x": 211,
+          "y": 398,
+          "width": 63,
+          "height": 17
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "MW51VSU",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "3",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 489,
+          "y": 263,
+          "width": 129,
+          "height": 114
+        },
+        "plate_box": {
+          "x": 530,
+          "y": 347,
+          "width": 49,
+          "height": 16
+        }
+      },
+      {
+        "vehicle_number": 3,
+        "plate_text": "GX5OGJ",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "2",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 271,
+          "y": 236,
+          "width": 115,
+          "height": 79
+        },
+        "plate_box": {
+          "x": 311,
+          "y": 283,
+          "width": 46,
+          "height": 13
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:32:24.830508"
+  },
+  "100": {
+    "frame_id": 100,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "GXI5OGJ",
+        "vehicle_type": "van",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 214,
+          "y": 322,
+          "width": 158,
+          "height": 111
+        },
+        "plate_box": {
+          "x": 266,
+          "y": 390,
+          "width": 54,
+          "height": 19
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "APO5JEO",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "4",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 452,
+          "y": 249,
+          "width": 107,
+          "height": 88
+        },
+        "plate_box": {
+          "x": 492,
+          "y": 307,
+          "width": 52,
+          "height": 16
+        }
+      },
+      {
+        "vehicle_number": 3,
+        "plate_text": "KWO5ZZX",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "2",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 259,
+          "y": 232,
+          "width": 102,
+          "height": 82
+        },
+        "plate_box": {
+          "x": 292,
+          "y": 280,
+          "width": 43,
+          "height": 17
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:34:06.437222"
+  },
+  "200": {
+    "frame_id": 200,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "APO5JEO",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 467,
+          "y": 349,
+          "width": 148,
+          "height": 121
+        },
+        "plate_box": {
+          "x": 516,
+          "y": 427,
+          "width": 64,
+          "height": 18
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "KWO5ZZK",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "4",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 194,
+          "y": 316,
+          "width": 154,
+          "height": 103
+        },
+        "plate_box": {
+          "x": 247,
+          "y": 380,
+          "width": 45,
+          "height": 14
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:35:25.895462"
+  },
+  "300": {
+    "frame_id": 300,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "FJI4ZHY",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "3",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 165,
+          "y": 375,
+          "width": 170,
+          "height": 108
+        },
+        "plate_box": {
+          "x": 226,
+          "y": 464,
+          "width": 60,
+          "height": 17
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "EY6INBG",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 511,
+          "y": 294,
+          "width": 150,
+          "height": 119
+        },
+        "plate_box": {
+          "x": 571,
+          "y": 368,
+          "width": 55,
+          "height": 18
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:37:50.249776"
+  },
+  "400": {
+    "frame_id": 400,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "AVO8HVF",
+        "vehicle_type": "van",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 172,
+          "y": 364,
+          "width": 134,
+          "height": 107
+        },
+        "plate_box": {
+          "x": 208,
+          "y": 443,
+          "width": 59,
+          "height": 19
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "HVI4CD",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "2",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 497,
+          "y": 378,
+          "width": 149,
+          "height": 98
+        },
+        "plate_box": {
+          "x": 556,
+          "y": 454,
+          "width": 48,
+          "height": 15
+        }
+      },
+      {
+        "vehicle_number": 3,
+        "plate_text": "BG65USJ",
+        "vehicle_type": "van",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 505,
+          "y": 206,
+          "width": 160,
+          "height": 184
+        },
+        "plate_box": {
+          "x": 571,
+          "y": 352,
+          "width": 40,
+          "height": 15
+        }
+      },
+      {
+        "vehicle_number": 4,
+        "plate_text": "NA54KGJ",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "4",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 222,
+          "y": 270,
+          "width": 122,
+          "height": 79
+        },
+        "plate_box": {
+          "x": 260,
+          "y": 325,
+          "width": 49,
+          "height": 15
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:40:40.732323"
+  },
+  "500": {
+    "frame_id": 500,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "NA54KGJ",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "CONVERTIBLE, BLACK CAR",
+        "vehicle_box": {
+          "x": 177,
+          "y": 355,
+          "width": 142,
+          "height": 107
+        },
+        "plate_box": {
+          "x": 217,
+          "y": 431,
+          "width": 59,
+          "height": 14
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "AK64DMV",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "3",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "DARK MIDSIZE SUV, VOLKSWAGEN",
+        "vehicle_box": {
+          "x": 215,
+          "y": 264,
+          "width": 145,
+          "height": 113
+        },
+        "plate_box": {
+          "x": 270,
+          "y": 337,
+          "width": 44,
+          "height": 17
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:42:38.308766"
+  },
+  "600": {
+    "frame_id": 600,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "EFIODZT",
+        "vehicle_type": "car",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 520,
+          "y": 343,
+          "width": 147,
+          "height": 110
+        },
+        "plate_box": {
+          "x": 562,
+          "y": 413,
+          "width": 52,
+          "height": 14
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "GJO6EPDV",
+        "vehicle_type": "",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 492,
+          "y": 199,
+          "width": 85,
+          "height": 67
+        },
+        "plate_box": {
+          "x": 521,
+          "y": 247,
+          "width": 34,
+          "height": 11
+        }
+      },
+      {
+        "vehicle_number": 3,
+        "plate_text": "DU62HYJV",
+        "vehicle_type": "car",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 690,
+          "y": 255,
+          "width": 139,
+          "height": 104
+        },
+        "plate_box": {
+          "x": 739,
+          "y": 323,
+          "width": 44,
+          "height": 16
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:20:11.985810"
+  },
+  "700": {
+    "frame_id": 700,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "AF65JKV",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "HATCHBACK FORD",
+        "vehicle_box": {
+          "x": 502,
+          "y": 367,
+          "width": 160,
+          "height": 112
+        },
+        "plate_box": {
+          "x": 558,
+          "y": 452,
+          "width": 62,
+          "height": 13
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "GJO6JPD",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "3",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "WHITE HATCHBACK",
+        "vehicle_box": {
+          "x": 496,
+          "y": 246,
+          "width": 111,
+          "height": 89
+        },
+        "plate_box": {
+          "x": 534,
+          "y": 304,
+          "width": 45,
+          "height": 10
+        }
+      },
+      {
+        "vehicle_number": 3,
+        "plate_text": "EYO9VVS",
+        "vehicle_type": "van",
+        "plate_state": "EU",
+        "plate_confidence": "1",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "VAN",
+        "vehicle_box": {
+          "x": 454,
+          "y": 148,
+          "width": 90,
+          "height": 77
+        },
+        "plate_box": {
+          "x": 482,
+          "y": 205,
+          "width": 32,
+          "height": 9
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:49:11.304072"
+  },
+  "800": {
+    "frame_id": 800,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "EY09 WK",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "white van (likely Vauxhall Vivaro), right lane behind the Mazda. \u201909 plate \u2248 2009 (Mar\u2013Aug).",
+        "vehicle_box": {
+          "x": 485,
+          "y": 182,
+          "width": 89,
+          "height": 79
+        },
+        "plate_box": {
+          "x": 508,
+          "y": 241,
+          "width": 38,
+          "height": 11
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T21:59:08.712054"
+  },
+  "900": {
+    "frame_id": 900,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "DAO7CLXv",
+        "vehicle_type": "",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "silver Mazda saloon (likely Mazda3), right lane mid-frame. \u201907 plate \u2248 2007 (Mar\u2013Aug).",
+        "vehicle_box": {
+          "x": 514,
+          "y": 340,
+          "width": 155,
+          "height": 107
+        },
+        "plate_box": {
+          "x": 559,
+          "y": 402,
+          "width": 60,
+          "height": 28
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "EY09VWS",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "white van (likely Vauxhall Vivaro), right lane behind the Mazda. \u201909 plate \u2248 2009 (Mar\u2013Aug)",
+        "vehicle_box": {
+          "x": 479,
+          "y": 217,
+          "width": 116,
+          "height": 121
+        },
+        "plate_box": {
+          "x": 511,
+          "y": 303,
+          "width": 53,
+          "height": 12
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:01:30.946111"
+  },
+  "1000": {
+    "frame_id": 1000,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "EY09VWS",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "white van (likely Vauxhall Vivaro), right lane behind the Mazda. \u201909 plate \u2248 2009 (Mar\u2013Aug).",
+        "vehicle_box": {
+          "x": 459,
+          "y": 291,
+          "width": 171,
+          "height": 170
+        },
+        "plate_box": {
+          "x": 516,
+          "y": 411,
+          "width": 52,
+          "height": 18
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:01:55.725706"
+  },
+  "1100": {
+    "frame_id": 1100,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "BP63LXUV",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "WHITE FORD VAN",
+        "vehicle_box": {
+          "x": 454,
+          "y": 250,
+          "width": 165,
+          "height": 143
+        },
+        "plate_box": {
+          "x": 515,
+          "y": 346,
+          "width": 71,
+          "height": 30
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:03:08.775835"
+  },
+  "1200": {
+    "frame_id": 1200,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "WG65ZFXV",
+        "vehicle_type": "car",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "DARK VOLVO",
+        "vehicle_box": {
+          "x": 459,
+          "y": 267,
+          "width": 137,
+          "height": 101
+        },
+        "plate_box": {
+          "x": 501,
+          "y": 333,
+          "width": 59,
+          "height": 15
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:03:32.388526"
+  },
+  "1300": {
+    "frame_id": 1300,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "NL64OGX",
+        "vehicle_type": "van",
+        "plate_state": "EU",
+        "plate_confidence": "2",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "WHITE VAN",
+        "vehicle_box": {
+          "x": 231,
+          "y": 215,
+          "width": 152,
+          "height": 125
+        },
+        "plate_box": {
+          "x": 272,
+          "y": 298,
+          "width": 59,
+          "height": 18
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:04:29.542361"
+  },
+  "1400": {
+    "frame_id": 1400,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "NL64OGXV",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "WHITE FORD VAN",
+        "vehicle_box": {
+          "x": 165,
+          "y": 310,
+          "width": 183,
+          "height": 152
+        },
+        "plate_box": {
+          "x": 217,
+          "y": 411,
+          "width": 71,
+          "height": 25
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "LPI4LJAV",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "4",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "BLACK VAUXHALL SEDAN",
+        "vehicle_box": {
+          "x": 711,
+          "y": 379,
+          "width": 0,
+          "height": 0
+        },
+        "plate_box": {
+          "x": 711,
+          "y": 379,
+          "width": 0,
+          "height": 0
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:05:38.654003"
+  },
+  "1600": {
+    "frame_id": 1600,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "CE6IWYL",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "4",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "GRAY VOLKSWAGEN MIDSIZED SUV",
+        "vehicle_box": {
+          "x": 236,
+          "y": 224,
+          "width": 112,
+          "height": 112
+        },
+        "plate_box": {
+          "x": 267,
+          "y": 295,
+          "width": 51,
+          "height": 19
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "SC3PD36",
+        "vehicle_type": "car",
+        "plate_state": "",
+        "plate_confidence": "1",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "",
+        "vehicle_box": {
+          "x": 476,
+          "y": 181,
+          "width": 77,
+          "height": 56
+        },
+        "plate_box": {
+          "x": 501,
+          "y": 217,
+          "width": 33,
+          "height": 8
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:06:57.856205"
+  },
+  "1700": {
+    "frame_id": 1700,
+    "vehicles": [
+      {
+        "vehicle_number": 1,
+        "plate_text": "CE6IWYL",
+        "vehicle_type": "car",
+        "plate_state": "EU",
+        "plate_confidence": "5",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "GRAY VOLKSWAGEN SEDAN",
+        "vehicle_box": {
+          "x": 179,
+          "y": 303,
+          "width": 150,
+          "height": 129
+        },
+        "plate_box": {
+          "x": 222,
+          "y": 385,
+          "width": 69,
+          "height": 28
+        }
+      },
+      {
+        "vehicle_number": 2,
+        "plate_text": "SC56DVP",
+        "vehicle_type": "van",
+        "plate_state": "",
+        "plate_confidence": "",
+        "light_condition": "day",
+        "weather": "clear",
+        "vehicle_notes": "AUDI SEDAN",
+        "vehicle_box": {
+          "x": 484,
+          "y": 212,
+          "width": 102,
+          "height": 71
+        },
+        "plate_box": {
+          "x": 518,
+          "y": 253,
+          "width": 40,
+          "height": 14
+        }
+      }
+    ],
+    "saved_at": "2025-10-15T22:08:18.845628"
+  }
+}

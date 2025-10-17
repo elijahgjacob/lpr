@@ -1,0 +1,119 @@
+{
+  "models": [
+    {
+      "id": "yolo_baseline",
+      "name": "YOLO Baseline",
+      "type": "local_yolo",
+      "config": {
+        "model_path": "models/license_plate_detector.pt",
+        "confidence_threshold": 0.25
+      }
+    },
+    {
+      "id": "yolo_high_conf",
+      "name": "YOLO High Confidence",
+      "type": "local_yolo",
+      "config": {
+        "model_path": "models/license_plate_detector.pt",
+        "confidence_threshold": 0.5
+      }
+    },
+    {
+      "id": "yolo_low_conf",
+      "name": "YOLO Low Confidence",
+      "type": "local_yolo",
+      "config": {
+        "model_path": "models/license_plate_detector.pt",
+        "confidence_threshold": 0.1
+      }
+    },
+    {
+      "id": "runpod_yolo11n",
+      "name": "RunPod YOLO11n Fast",
+      "type": "runpod_yolo",
+      "config": {
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/yolo11n.pt",
+        "confidence_threshold": 0.25,
+        "timeout": 15
+      }
+    },
+    {
+      "id": "runpod_yolo11s",
+      "name": "RunPod YOLO11s Balanced",
+      "type": "runpod_yolo",
+      "config": {
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/yolo11s.pt",
+        "confidence_threshold": 0.25,
+        "timeout": 20
+      }
+    },
+    {
+      "id": "runpod_yolo11m",
+      "name": "RunPod YOLO11m Accurate",
+      "type": "runpod_yolo",
+      "config": {
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/yolo11m.pt",
+        "confidence_threshold": 0.3,
+        "timeout": 25
+      }
+    },
+    {
+      "id": "runpod_yolo11l",
+      "name": "RunPod YOLO11l High Accuracy",
+      "type": "runpod_yolo",
+      "config": {
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/yolo11l.pt",
+        "confidence_threshold": 0.35,
+        "timeout": 30
+      }
+    },
+    {
+      "id": "runpod_yolo11x",
+      "name": "RunPod YOLO11x Maximum Accuracy",
+      "type": "runpod_yolo",
+      "config": {
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/yolo11x.pt",
+        "confidence_threshold": 0.4,
+        "timeout": 35
+      }
+    },
+    {
+      "id": "runpod_custom_license_plate",
+      "name": "RunPod Custom License Plate Model",
+      "type": "runpod_yolo",
+      "config": {
+        "runpod_endpoint": "https://api.runpod.ai/v2/your-endpoint-id/run",
+        "model_path": "/workspace/models/custom_license_plate_detector.pt",
+        "confidence_threshold": 0.25,
+        "timeout": 30
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Model registry for ALPR system comparison",
+    "version": "1.0.0",
+    "last_updated": "2024-10-16",
+    "usage": {
+      "local_yolo": "Requires local YOLO model files in models/ directory",
+      "runpod_yolo": "Requires RunPod API key and configured endpoints with YOLO models"
+    },
+    "setup_instructions": {
+      "runpod": [
+        "1. Set RUNPOD_API_KEY environment variable",
+        "2. Update runpod_endpoint URLs in model configs",
+        "3. Ensure YOLO models are available at specified paths on RunPod",
+        "4. Test endpoint connectivity before running comparisons"
+      ],
+      "local": [
+        "1. Download YOLO model files to models/ directory",
+        "2. Ensure model paths match configuration",
+        "3. Test model loading before running comparisons"
+      ]
+    }
+  }
+}

@@ -6,7 +6,7 @@ allowing easy comparison and evaluation of different detection approaches.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pathlib import Path
 
 
